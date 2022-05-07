@@ -7,10 +7,13 @@ const ChordScreen = () => {
     const [chord, set_chord] = React.useState(6);
     const [timer, set_timer] = React.useState({
         time_typed : "",
-        time_confirmed : 5000
+        time_confirmed : 10000
     });
     
+    let zeWorld;
+
     // Change the chords in a random way.
+
     const mysterious_note = () => {
         console.log("I have been called");
         const all_notes = ["A","Ab", "A#", "B", "Bb", "C", "C#", "D", "Db", "D#", "E", "Eb","F", "F#", "G", "Gb", "G#"];
@@ -21,13 +24,18 @@ const ChordScreen = () => {
         // Choose a random chord
         const random_chord = all_chords[Math.round(Math.random() * all_chords.length)];
         set_chord(random_chord);
-        setTimeout(mysterious_note, 2000 /* timer.time_confirmed */);   
+        zeWorld = setTimeout(mysterious_note, timer.time_confirmed);   
+        console.log(timer.time_confirmed);
+        console.log(zeWorld);
+        console.log(random_note + random_chord);
+        return zeWorld;   
     };
 
+    // ISSUE : Why this useEffect is called twice ?
     React.useEffect( ( ) => {
-        console.log("The Effect is called")
+        console.log("useMe!");
         mysterious_note();
-    }, [timer.time_confirmed])
+    }, [])
 
     // Update the value of timer 
     const update_timer = (event) => {
@@ -39,13 +47,23 @@ const ChordScreen = () => {
 
     // Confirm the value of the timer
     const confirm_timer_value = (event) => {
+        clearTimeout(zeWorld);
+        zeWorld = null;
         event.preventDefault();
         set_timer({
-            time_typed : 0,             // When the form is sent we resent the time typed.
-            time_confirmed : event.target.value
-        });
+            time_typed : 0,           
+            time_confirmed : timer.time_typed 
+        })
+/*         set_timer({
+            ...timer,             
+            time_typed : 0, // When the form is sent we resent the time typed.
+        }) */
+        ;
     }
 
+    React.useEffect( () => {
+        console.log(timer);
+    }, [timer]);
     return (
         <>
             {!note || !chord ? (
