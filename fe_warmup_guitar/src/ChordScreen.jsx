@@ -113,14 +113,12 @@ const ChordScreen = () => {
         }
         // trigger this timer. When delay is elapsed we call mysterious_note().
         start() {
-/*                 this.display_answer();
- */                this.timerId = setTimeout(mysterious_note, this.delay);  // With timerId we have a way to identify the setTimeout function, we need that to stop the right timer with the method stop()
+            this.timerId = setTimeout(mysterious_note, this.delay);  // With timerId we have a way to identify the setTimeout function, we need that to stop the right timer with the method stop()
             console.log(`TimerID(start) : ${this.timerId}`);
             return this.timerId;
         }
         // stop this timer.
         stop() {
-            set_answer(""); //We reset the value of answer when we stop this timer (just before starting a new one).
             clearTimeout(this.timerId);
             console.log(`We are cancelling this timer : ${this.timerId}`);
         };
@@ -148,9 +146,6 @@ const ChordScreen = () => {
     React.useEffect( () => {
         console.log(`new delay : ${JSON.stringify(delay)}`);
         if (delay.new_timer) {          // with this conditional we are sure to update the timer if and only if the user explicitly send the form.
-            
-            // 0 - We reset answer state
-            set_answer("nothingness!!!");
             // 1 - We stop the former timer
             current_timer.stop();
             // 2 - We create a new timer with the new value of timer
@@ -169,10 +164,6 @@ const ChordScreen = () => {
             set_answer("");
             setTimeout(right_fret.bind({}, chord, note), delay.time_note_visible - 5000); // BIND() to pass in parameters to setTimeout's callback - 5000 ? Because we display the answer during the last 5 seconds when the note is visible. For instance : The instance set the timer to last 5000ms ==>delay.note_visible = 10000ms ==> we want to display the answer during the last 5000ms(the user has 5000ms to reply).
     }, [note, chord]) 
-
-    React.useEffect( () => {
-        console.log(`THE ANSWER: ${answer}`);
-    }, [answer])
 
     
 // HANDLER FUNCTIONS
@@ -219,13 +210,3 @@ const ChordScreen = () => {
 
 export default ChordScreen;
 
-
-
-// TIMER SYNC EXPLANATION (IF NEEDED MAKE A SCHEMA TO EXPLAIN THE TIMER CYCLE) : 
-/* 
- we just need to set the timers properly. 
- There are 3 timers:
-TIMER1 - The timer selected by the user 
-TIMER2 - The timer before a new note is displayed 
-TIMER3 - The timer to display the correct answer.
- */
