@@ -1,70 +1,69 @@
-# Getting Started with Create React App
+# warmup_guitar
+A tiny app to learn the guitar notes from the neck to the 12th fret...let's rock!
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+# What the project does
+Every X seconds, the app displays randomly a note to play (for instance Bb) on a given chord (for instance the 5th chord)
+X : number of seconds to find the note on your guitar and play it. This value can be changed by the user.
 
-In the project directory, you can run:
 
-### `npm start`
+# Why the project is useful
+The guitar is a cool instrument but it's not as easy as it seems. 
+To build good foundations as a guitarist, it's important to know the notes on your Guitar from the neck to the 12th fret.
+A good guitarist must be able to find any notes on any chords at a moment's notice. This knowledge is the key to play solo and master this wonderful instrument.
+With this app, I provide an interface to learn these notes in a funny way (learning them by heart and sheer repetition can be boring,right ?)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# How users can get started with the project
+To come shortly
 
-### `npm test`
+# Where users can get help with your project
+Send me an email : nassers@nassmassa.com |nassermassadimi@gmail.com
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# Who maintains and contributes to the project
+It's a me ! Nasser Massadimi :D 
 
-### `npm run build`
+# New Features in the kitchen ?
+To be completed
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## THE LIFECYCLE OF THIS APP CAN BROKEN INTO THESE STAGES :
+ 
+There are 3 timers:
+    TIMER1 - The timer selected by the user 
+    TIMER2 - The timer to display the correct answer ==> 5000ms==> Triggered when TIMER1 is elapsed (5000ms before the end of TIMER3). (The user can see the answer during the 5 seconds following the end of TIMER1)
+    TIMER3 -  During this the current note is visible. When this timer is over, a new note is displayed  ==> TIMER1 + TIMER2
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+# STAGE 0 -  Initialisation of the app
+        States: 
+        note is initialised with a given value  (E)
+        note is initialised with a given value  (6)
+        Delay is initialised with the default values.
+        current_timer is updated with the value of  initial_timer (created with the class Timer). 
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# STAGE 1 - Timer1, Timer2, Timer3 are triggered
+        The note/chord to play is displayed on the UI
+        Because current_timer has changed, a side effect is triggered :
+        TIMER1 is triggered (using the method start() of the Timer object).
+        TIMER 2 is triggered
+        TIMER3 is also triggered.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# STAGE 2 - Timer1 and Timer2 are elapsed
+        TIMER2 is over :  The answer is updated with the right_answer. The user can see it on the UI
+    
+# STAGE 3 - Timer3 is elapsed. A new cycle begins (identical to STAGE1)
+        A new note is displayed on the UI.
+        The state answer is updated: its new value is "" (the anwser is not displayed yet).
+        A new_timer is set. current_timer = new_timer 
+            TIMER1 is triggered (using the method start() of the Timer object).
+            TIMER 2 is triggered
+            TIMER3 is also triggered.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+# SPECIAL STAGE  - The user sets a different stage
+        - delay.time_to_reply is updated
+        - We destroy the current_timer with the method stop() - (encapsule a clearTimeout to kill the ongoing setTimeout function). 
+        - A new object Timer is created with the new value of delay.time_to_reply
+        - current_timer is updated with this new Object Timer.
+        ==> BACK TO STAGE 1 
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
