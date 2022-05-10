@@ -13,7 +13,13 @@ const ChordScreen = () => {
         3 : "G", 
         2 : "B",
         1 : "E", 
-    };   
+    }; 
+    
+    // By default, the answer is visible during the last 5000ms.
+    const duration_answer_visible = 5000;
+    // By default, when the app starts, the user gets 5000ms to find the right fret. After this delay the answer appears.
+    const default_time_to_reply = 5000;
+
 
 
 // STATES
@@ -21,8 +27,9 @@ const ChordScreen = () => {
     const [chord, set_chord] = React.useState(1);
     const [delay, set_delay] = React.useState({
         time_typed : "",            // Updated everytime while the user type a new value for the delay
-        time_confirmed : 5000,      // Upadted when the user confirm the new delay
-        new_timer : false,          // switch to true when we update the timer. switch back to false when the current_timer has been updated with the new value of delay.time_confirmed
+        time_to_reply : default_time_to_reply,      // Upadted when the user confirm the new delay
+        time_note_visible : default_time_to_reply + duration_answer_visible,  
+        new_timer : false,          // switch to true when we update the timer. switch back to false when the current_timer has been updated with the new value of delay.time_note_visible
     });
 
     // required to store the current Timer ID.
@@ -36,8 +43,7 @@ const ChordScreen = () => {
 
     // DISPLAY RANDOM NOTE TO PLAY ON A RANDOM CHORD
     const mysterious_note = () => {
-        console.log("I have been called");
-        // Choose a random note
+        console.log("MYSTERIOUS_NOTE CALLED");        
         const random_index_note = Math.floor(Math.random() * all_notes.length);
         const random_note = all_notes[random_index_note];
         set_note(random_note);
@@ -48,7 +54,7 @@ const ChordScreen = () => {
         set_chord(random_chord_number);
         console.log(random_note + random_chord_number);
         // Create a new Timer (will be started in the useEffect (see below))
-        const next_timer = new Timer(delay.time_confirmed);
+        const next_timer = new Timer(delay.time_note_visible);
         set_current_timer(next_timer);
     };
 
@@ -57,6 +63,8 @@ const ChordScreen = () => {
     // input : 1 - the number of the chord (1, 2, 3...etc). | 2 - The note to play (A, B, C#...etc),
     // output :  the fret to play on the given chord (a number.)
     const right_fret = (number_of_chord, note_to_play) => {
+        console.log("RIGHT FRET CALLED");
+        set_answer("");
         let fret_to_play;
         console.log(`INPUT RIGHT_FRET: ${number_of_chord} ${note_to_play}`);
         //a - note_to_play = E   || open_chord_note = 5 ==> We deduce that open_chord_note = A.
@@ -82,9 +90,6 @@ const ChordScreen = () => {
             Ab : 11,
         }
         // c - the computation of the fret to play
-        console.log (`CHORD TO PLAY : ${chords_grid[note_to_play]}`);
-        console.log (`CHORD TO PLAY : ${chords_grid[open_chord_note]}`);
-
         const number_of_intervals = 12;                 // Why 12 ? Because 12 is the total number of interval (remember C_sharp = Db are the same note!). If we count 12 intervals, we get back to the same note. 
         if (chords_grid[note_to_play] > chords_grid[open_chord_note]) {
             // We just need to compute the interval between the 2 chords to know which fret should be played
@@ -94,11 +99,8 @@ const ChordScreen = () => {
             fret_to_play = number_of_intervals - chords_grid[open_chord_note] + chords_grid[note_to_play]; 
         }
         console.log(`FRET TO PLAY : ${fret_to_play}`);
-        return fret_to_play;
+        set_answer(fret_to_play);
     };
-
-
-
 
 
 
@@ -109,14 +111,16 @@ const ChordScreen = () => {
             this.delay = delay;
             this.timerId = null;   
         }
-        // a function to trigger this timer. When delay is elapsed we call mysterious_note().
+        // trigger this timer. When delay is elapsed we call mysterious_note().
         start() {
-            this.timerId = setTimeout(mysterious_note, this.delay);  // With timerId we have a way to identify the setTimeout function, we need that to stop the right timer with the method stop()
+/*                 this.display_answer();
+ */                this.timerId = setTimeout(mysterious_note, this.delay);  // With timerId we have a way to identify the setTimeout function, we need that to stop the right timer with the method stop()
             console.log(`TimerID(start) : ${this.timerId}`);
             return this.timerId;
         }
-        // a function to stop this delay.
+        // stop this timer.
         stop() {
+            set_answer(""); //We reset the value of answer when we stop this timer (just before starting a new one).
             clearTimeout(this.timerId);
             console.log(`We are cancelling this timer : ${this.timerId}`);
         };
@@ -127,7 +131,7 @@ const ChordScreen = () => {
 // SIDE EFFECTS ()
     // Create the initial timer during the first render
     React.useEffect ( () => {
-        let initial_timer = new Timer(delay.time_confirmed);
+        let initial_timer = new Timer(delay.time_note_visible);
         set_current_timer(initial_timer);
     }, []);
 
@@ -144,10 +148,13 @@ const ChordScreen = () => {
     React.useEffect( () => {
         console.log(`new delay : ${JSON.stringify(delay)}`);
         if (delay.new_timer) {          // with this conditional we are sure to update the timer if and only if the user explicitly send the form.
+            
+            // 0 - We reset answer state
+            set_answer("nothingness!!!");
             // 1 - We stop the former timer
             current_timer.stop();
             // 2 - We create a new timer with the new value of timer
-            let new_timer = new Timer(delay.time_confirmed);
+            let new_timer = new Timer(delay.time_note_visible);
             set_current_timer(new_timer);
             // 3 - We switch the property new_timer to false
             set_delay({
@@ -155,12 +162,17 @@ const ChordScreen = () => {
                 new_timer : false,
             })
         }
-    }, [delay.time_confirmed]);
+    }, [delay.time_to_reply]);
 
+    // Reset the value of the state answer. After a given amount of time display the solution
     React.useEffect ( () => {
-        set_answer(right_fret(chord, note));
-    }, [note, chord])
+            set_answer("");
+            setTimeout(right_fret.bind({}, chord, note), delay.time_note_visible - 5000); // BIND() to pass in parameters to setTimeout's callback - 5000 ? Because we display the answer during the last 5 seconds when the note is visible. For instance : The instance set the timer to last 5000ms ==>delay.note_visible = 10000ms ==> we want to display the answer during the last 5000ms(the user has 5000ms to reply).
+    }, [note, chord]) 
 
+    React.useEffect( () => {
+        console.log(`THE ANSWER: ${answer}`);
+    }, [answer])
 
     
 // HANDLER FUNCTIONS
@@ -172,12 +184,14 @@ const ChordScreen = () => {
         });
     };
 
-    // Confirm the value of the delay
+    // Confirm the value of the delay   
     const confirm_timer_value = (event) => {        
         event.preventDefault();
         set_delay({
+            ...delay,
             time_typed : 0,           
-            time_confirmed : delay.time_typed * 1000,
+            time_to_reply : delay.time_typed * 1000,
+            time_note_visible : (delay.time_typed *1000) + 5000,        // To include the time to display the right_fret
             new_timer : true, 
         });
     }
@@ -207,5 +221,11 @@ export default ChordScreen;
 
 
 
-// TIMER SYNC EXPLANATION : 
-
+// TIMER SYNC EXPLANATION (IF NEEDED MAKE A SCHEMA TO EXPLAIN THE TIMER CYCLE) : 
+/* 
+ we just need to set the timers properly. 
+ There are 3 timers:
+TIMER1 - The timer selected by the user 
+TIMER2 - The timer before a new note is displayed 
+TIMER3 - The timer to display the correct answer.
+ */
