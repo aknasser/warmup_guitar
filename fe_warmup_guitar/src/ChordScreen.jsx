@@ -1,6 +1,5 @@
 import * as React from "react" ;
 
-
 const ChordScreen = () => {
     
 // MAIN VARIABLES
@@ -16,9 +15,9 @@ const ChordScreen = () => {
     }; 
     
     // By default, the answer is visible during the last 5000ms.
-    const duration_answer_visible = 5000;
+    const duration_answer_visible = 3000;
     // By default, when the app starts, the user gets 5000ms to find the right fret. After this delay the answer appears.
-    const default_time_to_reply = 5000;
+    const default_time_to_reply = 8000;
 
 
 
@@ -60,7 +59,7 @@ const ChordScreen = () => {
 
 
 // DISPLAY THE RIGHT FRET TO BE PLAYED => The fret where the user should put his/her finger to produce the right note.
-    // input : 1 - the number of the chord (1, 2, 3...etc). | 2 - The note to play (A, B, C#...etc),
+    // input : 1 - the number corresponding to the chord (1, 2, 3...etc). | 2 - The note to play (A, B, C#...etc),
     // output :  the fret to play on the given chord (a number.)
     const right_fret = (number_of_chord, note_to_play) => {
         console.log("RIGHT FRET CALLED");
@@ -133,7 +132,7 @@ const ChordScreen = () => {
         set_current_timer(initial_timer);
     }, []);
 
-    // Trigger the current_timer we just set using the method start().
+    // If a timer exists, we trigger the current_timer we just set using the method start().
     React.useEffect( () => {
         if (current_timer !== null) {
             console.log(`current Timer : ${JSON.stringify(current_timer)}`);
@@ -162,7 +161,7 @@ const ChordScreen = () => {
     // Reset the value of the state answer. After a given amount of time display the solution
     React.useEffect ( () => {
             set_answer("");
-            setTimeout(right_fret.bind({}, chord, note), delay.time_note_visible - 5000); // BIND() to pass in parameters to setTimeout's callback - 5000 ? Because we display the answer during the last 5 seconds when the note is visible. For instance : The instance set the timer to last 5000ms ==>delay.note_visible = 10000ms ==> we want to display the answer during the last 5000ms(the user has 5000ms to reply).
+            setTimeout(right_fret.bind({}, chord, note), delay.time_note_visible - duration_answer_visible); // BIND() to pass in parameters to setTimeout's callback - 5000 ? Because we display the answer during the last 5 seconds when the note is visible. For example : The instance set the timer to last 5000ms ==>delay.note_visible = 10000ms ==> we want to display the answer during the last 5000ms(the user has 5000ms to reply).
     }, [note, chord]) 
 
     
@@ -180,9 +179,9 @@ const ChordScreen = () => {
         event.preventDefault();
         set_delay({
             ...delay,
-            time_typed : 0,           
+            time_typed : 0,       // To reset the input form.    
             time_to_reply : delay.time_typed * 1000,
-            time_note_visible : (delay.time_typed *1000) + 5000,        // To include the time to display the right_fret
+            time_note_visible : (delay.time_typed *1000) + duration_answer_visible,        // To include the time to display the right_fret
             new_timer : true, 
         });
     }
@@ -208,5 +207,7 @@ const ChordScreen = () => {
     );
 };
 
-export default ChordScreen;
 
+
+
+export default ChordScreen;
