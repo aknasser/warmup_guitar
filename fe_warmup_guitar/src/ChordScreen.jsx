@@ -14,7 +14,7 @@ const ChordScreen = () => {
 // REDUX STATES
     const answer = useSelector(state => state.answer); // Checked
     const current_timer_bis = useSelector(state => state.timer);
-    const delay_bis = useSelector(state => state.delay);
+    const delay = useSelector(state => state.delay);
     const note = useSelector(state => state.note); // Checked
     const dispatch = useDispatch(); 
 
@@ -30,25 +30,10 @@ const ChordScreen = () => {
         1 : "E", 
     }; 
     
-    // By default, the answer is visible during the last 5000ms.
-    const duration_answer_visible = 3000;
-    // By default, when the app starts, the user gets 5000ms to find the right fret. After this delay the answer appears.
-    const default_time_to_reply = 4000;
-
-
-
 // STATES
-    const [delay, set_delay] = React.useState({
-        time_typed : "",            // Updated everytime while the user type a new value for the delay
-        time_to_reply : default_time_to_reply,      // Upadted when the user confirm the new delay
-        time_note_visible : default_time_to_reply + duration_answer_visible,  
-        new_timer : false,          // switch to true when we update the timer. switch back to false when the current_timer has been updated with the new value of delay.time_note_visible
-    });
-
     // required to store the current Timer ID.
     // We will use it to identify the timer we need to stop with the stop() method of the class Timer
     const [current_timer, set_current_timer] = React.useState(null);
-
 
 
 //CORE FUNCTIONS
@@ -75,7 +60,9 @@ const ChordScreen = () => {
         console.log(random_note + random_chord_number);
         // Create a new Timer (will be started in the useEffect (see below))
         const next_timer = new Timer(delay.time_note_visible);
-        set_current_timer(next_timer);      
+/*         set_current_timer(next_timer);   */
+        dispatch(create_timer(next_timer));
+   
     };
 
 
@@ -153,7 +140,9 @@ React.useEffect( () => {
     // Create the initial timer during the first render
     React.useEffect ( () => {
         let initial_timer = new Timer(delay.time_note_visible);
-        set_current_timer(initial_timer);
+        /* set_current_timer(initial_timer); */
+        dispatch(create_timer({initial_timer}));
+
 
     }, []);
 
@@ -174,20 +163,22 @@ React.useEffect( () => {
             current_timer.stop();
             // 2 - We create a new timer with the new value of timer
             let new_timer = new Timer(delay.time_note_visible);
-            set_current_timer(new_timer);
+/*             set_current_timer(new_timer); */
+            dispatch(create_timer(new_timer));
 
             // 3 - We switch the property new_timer to false
-            set_delay({
+/*             set_delay({
                 ...delay,
                 new_timer : false,
-            })
+            }) */
+            dispatch(switch_off_delay);
         }
     }, [delay.time_to_reply]);
 
     // Reset the value of the state answer. After a given amount of time display the solution
     React.useEffect ( () => {
             dispatch(reset_answer());
-            setTimeout(right_fret.bind({}, note.chord, note.note), delay.time_note_visible - duration_answer_visible); // BIND() to pass in parameters to setTimeout's callback - 5000 ? Because we display the answer during the last 5 seconds when the note is visible. For example : The instance set the timer to last 5000ms ==>delay.note_visible = 10000ms ==> we want to display the answer during the last 5000ms(the user has 5000ms to reply).
+            setTimeout(right_fret.bind({}, note.chord, note.note), delay.time_note_visible - delay.duration_answer_visible); // BIND() to pass in parameters to setTimeout's callback - 5000 ? Because we display the answer during the last 5 seconds when the note is visible. For example : The instance set the timer to last 5000ms ==>delay.note_visible = 10000ms ==> we want to display the answer during the last 5000ms(the user has 5000ms to reply).
     }, [note.note, note.chord]) 
 
     
@@ -195,23 +186,25 @@ React.useEffect( () => {
     // Update the value of delay 
     const update_timer = (event) => {
         console.log(event.target.value)
-        set_delay({
+/*         set_delay({
             ...delay,
             time_typed : event.target.value,
-        });
+        }); */
+        dispatch(new_value_typed(event.target.value))
     };
 
     // Confirm the value of the delay   
     const confirm_timer_value = (event) => {  
         console.log("boyo");  
         event.preventDefault();
-        set_delay({
+/*         set_delay({
             ...delay,
             time_typed : 0,       // To reset the input form.    
             time_to_reply : delay.time_typed * 1000,
             time_note_visible : (delay.time_typed *1000) + duration_answer_visible,        // To include the time to display the right_fret
             new_timer : true, 
-        });
+        }); */
+        dispatch(new_delay_confirmed())
     }
 
 
