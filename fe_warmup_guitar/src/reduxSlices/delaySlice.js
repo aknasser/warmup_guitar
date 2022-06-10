@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 // By default, the answer is visible during the last 5000ms.
 const duration_answer_visible = 3000;
 // By default, when the app starts, the user gets 5000ms to find the right fret. After this delay the answer appears.
-const default_time_to_reply = 8000;
+const default_time_to_reply = 5000;
 
 // Delay : The time available to answer a question.
 

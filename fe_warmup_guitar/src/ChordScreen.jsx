@@ -5,7 +5,6 @@ import { useSelector, useDispatch } from 'react-redux'
 
 // REDUX ACTIONS
 import { display_answer, reset_answer } from "./reduxSlices/answerSlice";
-import { create_timer } from "./reduxSlices/currentTimerSlice";
 import { switch_off_delay,new_value_typed, new_delay_confirmed } from "./reduxSlices/delaySlice";
 import { update_chord_or_note } from "./reduxSlices/noteSlice";
 
@@ -60,8 +59,7 @@ const ChordScreen = () => {
         console.log(random_note + random_chord_number);
         // Create a new Timer (will be started in the useEffect (see below))
         const next_timer = new Timer(delay.time_note_visible);
-/*         set_current_timer(next_timer);   */
-        dispatch(create_timer(next_timer));
+        set_current_timer(next_timer);   
    
     };
 
@@ -140,10 +138,7 @@ React.useEffect( () => {
     // Create the initial timer during the first render
     React.useEffect ( () => {
         let initial_timer = new Timer(delay.time_note_visible);
-        /* set_current_timer(initial_timer); */
-        dispatch(create_timer({initial_timer}));
-
-
+        set_current_timer(initial_timer);
     }, []);
 
     // If a timer exists, we trigger the current_timer we just set using the method start().
@@ -163,8 +158,7 @@ React.useEffect( () => {
             current_timer.stop();
             // 2 - We create a new timer with the new value of timer
             let new_timer = new Timer(delay.time_note_visible);
-/*             set_current_timer(new_timer); */
-            dispatch(create_timer(new_timer));
+            set_current_timer(new_timer);
 
             // 3 - We switch the property new_timer to false
 /*             set_delay({
