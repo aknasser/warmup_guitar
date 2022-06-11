@@ -8,7 +8,7 @@ const note_slice = createSlice({
     },
     reducers : {
         update_chord_or_note : (state, action) => {
-                return state = {
+                return {
                     ...state,
                     [action.payload.property] : action.payload.value
                 }
