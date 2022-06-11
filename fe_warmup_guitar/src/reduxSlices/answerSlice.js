@@ -6,10 +6,10 @@ export const answer_slice  = createSlice({
     initialState : "",
     reducers : {
         display_answer : (state, action) => {
-            return state = action.payload;
+            return  action.payload;
         },
         reset_answer : state => {
-            return state = ""
+            return  ""
         },
     }
 })

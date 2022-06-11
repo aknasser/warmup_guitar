@@ -19,7 +19,7 @@ export const delay_slice = createSlice({
     },
     reducers : {
         switch_off_delay : state => {
-            return state = {
+            return {
                 ...state,
                 new_timer : false,
             }
@@ -27,7 +27,7 @@ export const delay_slice = createSlice({
         // To check what the user is currently typing
         new_value_typed : (state, action) => {
             console.log("coucou")
-            return state = {
+            return {
                 ...state,
                 time_typed : action.payload,
             }
